@@ -6,11 +6,10 @@ import { createServer } from "http";
 import connectDB from "./lib/db";
 import cors from "cors";
 import { initSocket } from "./lib/socket";
-import redisClient from "./lib/redis";
+import jobRoutes from "./routes/jobRoutes";
 import assignmentRoutes from "./routes/assignments";
 import toolkitRoutes from "./routes/toolkit";
 import "./workers/aiWorker";
-
 
 
 const app = express();
@@ -23,7 +22,7 @@ app.use(cors());
 
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/toolkit", toolkitRoutes);
-
+app.use("/api/toolkit/job", jobRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });

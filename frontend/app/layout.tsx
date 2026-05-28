@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
+
+import "./globals.css";
+
 import Providers from "./providers";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "VedaAI",
-  description: "AI Assessment Creator",
+  description:
+    "AI-powered assessment generation platform for educators.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <body>
-        <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive"/>
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
+      <body className="antialiased">
         <Providers>
           {children}
         </Providers>
@@ -19,3 +28,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

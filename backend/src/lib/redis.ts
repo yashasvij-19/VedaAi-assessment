@@ -1,11 +1,28 @@
-import Redis from "ioredis"
+import Redis from "ioredis";
 
-const redis = new Redis(process.env.REDIS_URL as string,{
-  maxRetriesPerRequest: 1,
-  connectTimeout: 5000,
+declare global {
+  var redis: Redis | undefined;
+}
+
+const redis =
+  global.redis ||
+  new Redis(process.env.REDIS_URL || "redis://127.0.0.1:6379", {
+    maxRetriesPerRequest: null,
+    retryStrategy(times) {
+      return Math.min(times * 100, 3000);
+    },
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  global.redis = redis;
+}
+
+redis.on("connect", () => {
+  console.log("Redis connected");
 });
 
-redis.on("connect",() => console.log("Redis connected"));
-redis.on("error",(err:Error) => console.error("Redis error", err));
+redis.on("error", (err) => {
+  console.error("Redis error:", err.message);
+});
 
 export default redis;

@@ -1,6 +1,8 @@
 import { Queue } from "bullmq";
-import bullmqConnection from "./bullMQConnection";
+import redis from "./redis";
 
-const assignmentQueue = new Queue("assignment-generation", { connection: bullmqConnection });
+const assignmentQueue = new Queue("assignment-generation", {
+  connection: redis,
+});
 
 export default assignmentQueue;

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import assignmentQueue from "../lib/queue";
 import Output from "../models/Output";
+import redis from "../lib/redis";
 
 const router = Router();
 
@@ -64,11 +65,26 @@ Rules:
 
 router.get("/output/:id", async (req, res) => {
   try {
-    const output = await Output.findById(req.params.id);
+    const { id } = req.params;
+
+    // Check Redis cache first
+    const cached = await redis.get(`output:${id}`);
+    if (cached) {
+      console.log("Cache hit for output:", id);
+      res.json(JSON.parse(cached));
+      return;
+    }
+
+    // If not cached, fetch from MongoDB
+    const output = await Output.findById(id);
     if (!output) {
       res.status(404).json({ message: "Output not found" });
       return;
     }
+
+    // Save to Redis cache for 1 hour
+    await redis.set(`output:${id}`, JSON.stringify(output), "EX", 3600);
+
     res.json(output);
   } catch (error) {
     res.status(500).json({ message: String(error) });
