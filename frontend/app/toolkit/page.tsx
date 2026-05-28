@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-} from "react";
+import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -13,121 +10,85 @@ import Topbar from "../../components/Topbar";
 import axios from "axios";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+const socket = io("process.env.NEXT_PUBLIC_API_URL", {
   transports: ["polling", "websocket"],
 });
 
 export default function Toolkit() {
   const router = useRouter();
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [sessionId] = useState(() =>
-    Math.random()
-      .toString(36)
-      .slice(2)
-  );
+  const [sessionId] = useState(() => Math.random().toString(36).slice(2));
 
-  const [form, setForm] =
-    useState({
-      subject: "",
-      className: "",
-      school:
-        "Delhi Public School",
-      timeAllowed:
-        "45 minutes",
-      instructions: "",
-      prompt: "",
-      questionTypes: [
-        {
-          type: "Short Questions",
-          count: 5,
-          marks: 2,
-        },
-      ],
-    });
+  const [form, setForm] = useState({
+    subject: "",
+    className: "",
+    school: "Delhi Public School",
+    timeAllowed: "45 minutes",
+    instructions: "",
+    prompt: "",
+    questionTypes: [
+      {
+        type: "Short Questions",
+        count: 5,
+        marks: 2,
+      },
+    ],
+  });
 
   useEffect(() => {
-    const handleComplete = (
-      data: any
-    ) => {
-      if (
-        data.sessionId ===
-        sessionId
-      ) {
+    const handleComplete = (data: any) => {
+      if (data.sessionId === sessionId) {
         setLoading(false);
 
-        router.push(
-          `/output/${data.outputId}`
-        );
+        router.push(`/output/${data.outputId}`);
       }
     };
 
-    socket.on(
-      "generation:complete",
-      handleComplete
-    );
+    socket.on("generation:complete", handleComplete);
 
     return () => {
-      socket.off(
-        "generation:complete",
-        handleComplete
-      );
+      socket.off("generation:complete", handleComplete);
     };
   }, [sessionId, router]);
 
-  const handleGenerate =
-    async () => {
-      if (
-        !form.subject ||
-        !form.className
-      ) {
-        alert(
-          "Please fill subject and class!"
-        );
+  const handleGenerate = async () => {
+    if (!form.subject || !form.className) {
+      alert("Please fill subject and class!");
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        await axios.post(
-  "http://127.0.0.1:5000/api/toolkit/generate",
-          {
-            ...form,
-            sessionId,
-          }
-        );
-      } catch (error) {
-        console.error(error);
+      await axios.post("http://127.0.0.1:5000/api/toolkit/generate", {
+        ...form,
+        sessionId,
+      });
+    } catch (error) {
+      console.error(error);
 
-        setLoading(false);
+      setLoading(false);
 
-        alert(
-          "Failed to generate question paper."
-        );
-      }
-    };
+      alert("Failed to generate question paper.");
+    }
+  };
 
-  const questionTypeOptions =
-    [
-      "Multiple Choice Questions",
-      "Short Questions",
-      "Long Answer Questions",
-      "Diagram/Graph-Based Questions",
-      "Numerical Problems",
-    ];
+  const questionTypeOptions = [
+    "Multiple Choice Questions",
+    "Short Questions",
+    "Long Answer Questions",
+    "Diagram/Graph-Based Questions",
+    "Numerical Problems",
+  ];
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
       <Sidebar />
 
-      <Topbar
-        title="AI Toolkit"
-        showBack={false}
-      />
+      <Topbar title="AI Toolkit" showBack={false} />
 
       <div className="flex-1 md:ml-64 pt-16 md:pt-8 pb-24 md:pb-8">
         <div className="max-w-6xl mx-auto px-4 md:px-8">
@@ -137,8 +98,7 @@ export default function Toolkit() {
 
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-medium mb-4">
-                ✨ AI Powered Assessment
-                Engine
+                ✨ AI Powered Assessment Engine
               </div>
 
               <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-3">
@@ -146,10 +106,8 @@ export default function Toolkit() {
               </h1>
 
               <p className="text-slate-300 max-w-2xl leading-relaxed">
-                Generate intelligent,
-                structured and curriculum
-                aligned question papers
-                instantly using AI.
+                Generate intelligent, structured and curriculum aligned question
+                papers instantly using AI.
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
@@ -182,66 +140,46 @@ export default function Toolkit() {
                   </h2>
 
                   <p className="text-sm text-slate-500 mt-1">
-                    Configure your
-                    AI-generated question
-                    paper.
+                    Configure your AI-generated question paper.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {[
                     {
-                      label:
-                        "School Name",
-                      value:
-                        form.school,
+                      label: "School Name",
+                      value: form.school,
                       key: "school",
                     },
                     {
-                      label:
-                        "Subject",
-                      value:
-                        form.subject,
+                      label: "Subject",
+                      value: form.subject,
                       key: "subject",
                     },
                     {
                       label: "Class",
-                      value:
-                        form.className,
+                      value: form.className,
                       key: "className",
                     },
                     {
-                      label:
-                        "Time Allowed",
-                      value:
-                        form.timeAllowed,
+                      label: "Time Allowed",
+                      value: form.timeAllowed,
                       key: "timeAllowed",
                     },
                   ].map((field) => (
-                    <div
-                      key={field.key}
-                    >
+                    <div key={field.key}>
                       <label className="text-sm font-medium text-slate-700 block mb-2">
                         {field.label}
                       </label>
 
                       <input
                         type="text"
-                        value={
-                          field.value
-                        }
-                        placeholder={
-                          field.label
-                        }
-                        onChange={(
-                          e
-                        ) =>
+                        value={field.value}
+                        placeholder={field.label}
+                        onChange={(e) =>
                           setForm({
                             ...form,
-                            [field.key]:
-                              e
-                                .target
-                                .value,
+                            [field.key]: e.target.value,
                           })
                         }
                         className="w-full h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
@@ -260,9 +198,7 @@ export default function Toolkit() {
                     </h2>
 
                     <p className="text-sm text-slate-500 mt-1">
-                      Customize question
-                      distribution and
-                      marks.
+                      Customize question distribution and marks.
                     </p>
                   </div>
 
@@ -270,16 +206,14 @@ export default function Toolkit() {
                     onClick={() =>
                       setForm({
                         ...form,
-                        questionTypes:
-                          [
-                            ...form.questionTypes,
-                            {
-                              type:
-                                "Short Questions",
-                              count: 3,
-                              marks: 2,
-                            },
-                          ],
+                        questionTypes: [
+                          ...form.questionTypes,
+                          {
+                            type: "Short Questions",
+                            count: 3,
+                            marks: 2,
+                          },
+                        ],
                       })
                     }
                     className="h-11 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition-all"
@@ -289,198 +223,131 @@ export default function Toolkit() {
                 </div>
 
                 <div className="space-y-4">
-                  {form.questionTypes.map(
-                    (
-                      qt,
-                      index
-                    ) => (
-                      <div
-                        key={index}
-                        className="border border-slate-200 rounded-2xl p-4"
-                      >
-                        <div className="flex flex-col md:flex-row gap-4">
-                          <select
-                            value={
-                              qt.type
-                            }
-                            onChange={(
-                              e
-                            ) => {
-                              const updated =
-                                [
-                                  ...form.questionTypes,
-                                ];
+                  {form.questionTypes.map((qt, index) => (
+                    <div
+                      key={index}
+                      className="border border-slate-200 rounded-2xl p-4"
+                    >
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <select
+                          value={qt.type}
+                          onChange={(e) => {
+                            const updated = [...form.questionTypes];
 
-                              updated[
-                                index
-                              ].type =
-                                e
-                                  .target
-                                  .value;
+                            updated[index].type = e.target.value;
 
-                              setForm({
-                                ...form,
-                                questionTypes:
-                                  updated,
-                              });
-                            }}
-                            className="flex-1 h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm focus:outline-none"
-                          >
-                            {questionTypeOptions.map(
-                              (
-                                opt
-                              ) => (
-                                <option
-                                  key={
-                                    opt
-                                  }
-                                >
-                                  {opt}
-                                </option>
-                              )
-                            )}
-                          </select>
+                            setForm({
+                              ...form,
+                              questionTypes: updated,
+                            });
+                          }}
+                          className="flex-1 h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm focus:outline-none"
+                        >
+                          {questionTypeOptions.map((opt) => (
+                            <option key={opt}>{opt}</option>
+                          ))}
+                        </select>
 
-                          <div className="flex items-center gap-3">
-                            {/* Count */}
-                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-3 h-12">
-                              <button
-                                onClick={() => {
-                                  const updated =
-                                    [
-                                      ...form.questionTypes,
-                                    ];
-
-                                  updated[
-                                    index
-                                  ].count =
-                                    Math.max(
-                                      1,
-                                      qt.count -
-                                        1
-                                    );
-
-                                  setForm({
-                                    ...form,
-                                    questionTypes:
-                                      updated,
-                                  });
-                                }}
-                              >
-                                −
-                              </button>
-
-                              <span className="text-sm font-medium w-6 text-center">
-                                {
-                                  qt.count
-                                }
-                              </span>
-
-                              <button
-                                onClick={() => {
-                                  const updated =
-                                    [
-                                      ...form.questionTypes,
-                                    ];
-
-                                  updated[
-                                    index
-                                  ].count += 1;
-
-                                  setForm({
-                                    ...form,
-                                    questionTypes:
-                                      updated,
-                                  });
-                                }}
-                              >
-                                +
-                              </button>
-                            </div>
-
-                            {/* Marks */}
-                            <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 rounded-2xl px-3 h-12">
-                              <button
-                                onClick={() => {
-                                  const updated =
-                                    [
-                                      ...form.questionTypes,
-                                    ];
-
-                                  updated[
-                                    index
-                                  ].marks =
-                                    Math.max(
-                                      1,
-                                      qt.marks -
-                                        1
-                                    );
-
-                                  setForm({
-                                    ...form,
-                                    questionTypes:
-                                      updated,
-                                  });
-                                }}
-                              >
-                                −
-                              </button>
-
-                              <span className="text-sm font-medium w-6 text-center text-orange-600">
-                                {
-                                  qt.marks
-                                }
-                              </span>
-
-                              <button
-                                onClick={() => {
-                                  const updated =
-                                    [
-                                      ...form.questionTypes,
-                                    ];
-
-                                  updated[
-                                    index
-                                  ].marks += 1;
-
-                                  setForm({
-                                    ...form,
-                                    questionTypes:
-                                      updated,
-                                  });
-                                }}
-                              >
-                                +
-                              </button>
-                            </div>
-
+                        <div className="flex items-center gap-3">
+                          {/* Count */}
+                          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-3 h-12">
                             <button
                               onClick={() => {
-                                const updated =
-                                  form.questionTypes.filter(
-                                    (
-                                      _,
-                                      i
-                                    ) =>
-                                      i !==
-                                      index
-                                  );
+                                const updated = [...form.questionTypes];
+
+                                updated[index].count = Math.max(
+                                  1,
+                                  qt.count - 1,
+                                );
 
                                 setForm({
                                   ...form,
-                                  questionTypes:
-                                    updated,
+                                  questionTypes: updated,
                                 });
                               }}
-                              className="w-12 h-12 rounded-2xl border border-red-100 bg-red-50 text-red-500"
                             >
-                              ×
+                              −
+                            </button>
+
+                            <span className="text-sm font-medium w-6 text-center">
+                              {qt.count}
+                            </span>
+
+                            <button
+                              onClick={() => {
+                                const updated = [...form.questionTypes];
+
+                                updated[index].count += 1;
+
+                                setForm({
+                                  ...form,
+                                  questionTypes: updated,
+                                });
+                              }}
+                            >
+                              +
                             </button>
                           </div>
+
+                          {/* Marks */}
+                          <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 rounded-2xl px-3 h-12">
+                            <button
+                              onClick={() => {
+                                const updated = [...form.questionTypes];
+
+                                updated[index].marks = Math.max(
+                                  1,
+                                  qt.marks - 1,
+                                );
+
+                                setForm({
+                                  ...form,
+                                  questionTypes: updated,
+                                });
+                              }}
+                            >
+                              −
+                            </button>
+
+                            <span className="text-sm font-medium w-6 text-center text-orange-600">
+                              {qt.marks}
+                            </span>
+
+                            <button
+                              onClick={() => {
+                                const updated = [...form.questionTypes];
+
+                                updated[index].marks += 1;
+
+                                setForm({
+                                  ...form,
+                                  questionTypes: updated,
+                                });
+                              }}
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <button
+                            onClick={() => {
+                              const updated = form.questionTypes.filter(
+                                (_, i) => i !== index,
+                              );
+
+                              setForm({
+                                ...form,
+                                questionTypes: updated,
+                              });
+                            }}
+                            className="w-12 h-12 rounded-2xl border border-red-100 bg-red-50 text-red-500"
+                          >
+                            ×
+                          </button>
                         </div>
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -491,14 +358,11 @@ export default function Toolkit() {
                 </h2>
 
                 <textarea
-                  value={
-                    form.instructions
-                  }
+                  value={form.instructions}
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      instructions:
-                        e.target.value,
+                      instructions: e.target.value,
                     })
                   }
                   placeholder="Focus on NCERT chapters 1-5, include application-based questions, maintain balanced difficulty..."
@@ -520,9 +384,7 @@ export default function Toolkit() {
                   </h2>
 
                   <p className="text-sm text-slate-500 mt-1">
-                    Guide the AI to
-                    generate optimized
-                    assessments.
+                    Guide the AI to generate optimized assessments.
                   </p>
                 </div>
 
@@ -531,8 +393,7 @@ export default function Toolkit() {
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      prompt:
-                        e.target.value,
+                      prompt: e.target.value,
                     })
                   }
                   placeholder="Generate a structured question paper for Class 5 Science with balanced difficulty distribution..."
@@ -540,15 +401,11 @@ export default function Toolkit() {
                 />
 
                 <button
-                  onClick={
-                    handleGenerate
-                  }
+                  onClick={handleGenerate}
                   disabled={loading}
                   className="w-full h-14 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 text-white font-semibold text-sm hover:opacity-95 transition-all active:scale-[0.99] disabled:opacity-50 shadow-lg"
                 >
-                  {loading
-                    ? "Generating..."
-                    : "✨ Generate Question Paper"}
+                  {loading ? "Generating..." : "✨ Generate Question Paper"}
                 </button>
 
                 {loading && (
@@ -558,8 +415,7 @@ export default function Toolkit() {
                     </div>
 
                     <p className="text-xs text-slate-500 mt-3 text-center">
-                      Generating your
-                      assessment...
+                      Generating your assessment...
                     </p>
                   </div>
                 )}

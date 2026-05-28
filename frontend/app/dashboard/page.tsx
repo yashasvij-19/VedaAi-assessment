@@ -106,7 +106,7 @@ function AssignmentCard({
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/assignments/${assignment._id}`
+        `process.env.NEXT_PUBLIC_API_URL/api/assignments/${assignment._id}`
       );
 
       // refresh list properly instead of reload
