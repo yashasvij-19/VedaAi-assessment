@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const AssignmentSchema = new mongoose.Schema({
-title:{type:String, required:true},
-subject:{type:String, required:true},
-className:{type:String, required:true},
+title:{type:String},
+subject:{type:String},
+className:{type:String},
 dueDate:{type:Date, required:true},
 questionTypes: [
   {

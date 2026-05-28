@@ -8,7 +8,8 @@ import cors from "cors";
 import { initSocket } from "./lib/socket";
 import redisClient from "./lib/redis";
 import assignmentRoutes from "./routes/assignments";
-import outputRoutes from "./routes/output";
+import toolkitRoutes from "./routes/toolkit";
+import "./workers/aiWorker";
 
 
 
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(cors()); 
 
 app.use("/api/assignments", assignmentRoutes);
-app.use("/api/output", outputRoutes);
+app.use("/api/toolkit", toolkitRoutes);
 
 
 app.get("/health", (req, res) => {

@@ -29,7 +29,9 @@ router.post("/", upload.single("file"), async (req, res) => {
     try {
         const assignment = new Assignment({
             ...req.body,
-        questionTypes: JSON.parse(req.body.questionTypes),
+        questionTypes: typeof req.body.questionTypes === "string" 
+  ? JSON.parse(req.body.questionTypes) 
+  : req.body.questionTypes,
         fileUrl: req.file ? req.file.path : null,
         fileName: req.file ? req.file.originalname : null,
         });
@@ -37,9 +39,9 @@ router.post("/", upload.single("file"), async (req, res) => {
         io.emit("assignment created",assignment);
         res.status(201).json(assignment);
     } catch (error) {
-        res.status(500).json({ message: "something went wrong" });
+    console.error("Assignment creation error:", error);
+    res.status(500).json({ message: String(error) });
     }
-
 })
 
 router.get("/:id", async(req,res) => {

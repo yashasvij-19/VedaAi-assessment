@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { createAssignment, addQuestionType, removeQuestionType, updateQuestionType, setDueDate, setInstructions, setFileName } from "../../store/assignmentSlice";
+import { createAssignment, addQuestionType, removeQuestionType, updateQuestionType, setTitle,setDueDate, setInstructions, setFileName } from "../../store/assignmentSlice";
 import Sidebar from "../../components/Sidebar";
 import { useRouter } from "next/navigation";
 
@@ -36,6 +36,7 @@ export default function CreateAssignment() {
     if (!validate()) return;
     const data = new FormData();
     if (file) data.append("file", file);
+    data.append("title", formData.title);
     data.append("dueDate", formData.dueDate);
     data.append("questionTypes", JSON.stringify(formData.questionTypes));
     data.append("instructions", formData.instructions);
@@ -76,7 +77,16 @@ export default function CreateAssignment() {
             </label>
             {formData.fileName && <p className="text-xs text-green-600 mt-2">✓ {formData.fileName}</p>}
           </div>
-
+{/* Title */}
+<div className="mb-4">
+  <label className="text-sm font-medium text-gray-700 block mb-1">Assignment Title</label>
+  <input
+    type="text"
+    placeholder="e.g. Quiz on Electricity"
+    onChange={(e) => dispatch(setTitle(e.target.value))}
+    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+  />
+</div>
           {/* Due Date */}
           <div className="mb-4">
             <label className="text-sm font-medium text-gray-700 block mb-1">Due Date</label>
